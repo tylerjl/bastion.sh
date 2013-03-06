@@ -49,35 +49,50 @@ main() {
 
   [ $DEBUG ] || [ $VERBOSE ] && info "Got distro of: $DISTRO"
 
-  for task in syncookies ; do
-    $task
+  for script in ./tasks/* ; do
+    TASK="$(basename $script | \
+      sed 's/^[^a-zA-Z]*\([a-zA-Z]\{1,\}\)[.][a-z]\{1,\}$/\1/')"
+
+    source $script
+
+    prevalidate $TASK task_precheck || continue
+
+    if [ ! ${AUTO} ] ; then
+      info "${TASK} wants to execute:\n\t\t$(task_explain)"
+      if ! confirm ; then
+        info "Skipping ${TASK}"
+        continue
+      fi
+    fi
+
+    if CMD_RESULTS="$((task_run) 2>&1)" ; then
+      ok ${TASK}
+    else
+      error "${TASK} could not complete. See error:"
+      error "${CMD_RESULTS}"
+    fi
+
   done
 
   ok "Completed $(basename $0)"
 }
 
-syncookies() {
-  FLAG="/proc/sys/net/ipv4/tcp_syncookies"
-  CMD="/bin/echo 1 > $FLAG"
+prevalidate() {
+  CHECK_INFO="$($2)"
+  RET=$?
 
-  if [ ! -f $FLAG ] ; then
-    error "$FLAG does not exist, skipping ${FUNCNAME[0]}"
+  if [ "${RET}" = 0 ] ; then
+    return 0
+  elif [ "${RET}" = 1 ] ; then
+    info "${CHECK_INFO}, skipping ${1}"
     return 1
-  elif silence ${GREP} 1 ${FLAG} ; then
-    info "${FLAG} is already set, skipping ${FUNCNAME[0]}"
+  elif [ "${RET}" = 2 ] ; then
+    warn "${CHECK_INFO}"
     return 0
-  fi
-
-  info "${FUNCNAME[0]} wants to execute:\n\t\t$CMD"
-
-  if confirm ; then
-    ${CMD}
   else
-    info "Skipping ${FUNCNAME[0]}"
-    return 0
+    error "${CHECK_INFO}, skipping ${1}"
+    return 1
   fi
-
-  if [ "$?" = "0" ] ; then ok ${FUNCNAME[0]} ; else error ${FUNCNAME[0]} ; fi
 }
 
 ###########################
