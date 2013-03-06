@@ -50,6 +50,8 @@ main() {
   [ $DEBUG ] || [ $VERBOSE ] && info "Got distro of: $DISTRO"
 
   for script in ./tasks/* ; do
+    [ -x $script ] || continue
+
     TASK="$(basename $script | \
       sed 's/^[^a-zA-Z]*\([a-zA-Z]\{1,\}\)[.][a-z]\{1,\}$/\1/')"
 
