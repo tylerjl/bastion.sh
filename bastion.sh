@@ -158,7 +158,10 @@ warn()  { echo $'[\e[1;33m warn \e[0m]' $@ ; }
 
 death() { error $@ ; exit 1 ; }
 
-silence() { (($@) 2>&1) > /dev/null ; }
+silence() {
+  (($@) 2>&1) > /dev/null
+  return "${?}"
+}
 
 help() { echo "$HELPTEXT" ; exit 0 ; }
 
