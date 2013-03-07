@@ -29,7 +29,10 @@ task_precheck() {
   if [ "$(basename ${PKG_MGR})" = "yum" ] ; then
     UPDATE_CHECK="$(${PKG_MGR} list updates -q | wc -l | xargs echo -1 + | bc)"
   elif [ "$(basename ${PKG_MGR})" = "apt-get" ] ; then
-    silence ${PKG_MGR} update || echo "Could not update ${PKG_MGR}" ; return 5
+    if [ ! silence ${PKG_MGR} update ] ; then
+      echo "Could not update ${PKG_MGR}"
+      return 5
+    fi
     UPDATE_CHECK="$(${PKG_MGR} -q --assume-no | grep installed | awk '{ print $1; }')"
   fi
 
