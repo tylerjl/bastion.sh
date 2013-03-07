@@ -48,7 +48,7 @@ task_explain() {
   if [ "$(basename ${PKG_MGR})" = "yum" ] ; then
     UPDATE_CHECK="$(${PKG_MGR} list updates -q | wc -l | xargs echo -1 + | bc)"
   elif [ "$(basename ${PKG_MGR})" = "apt-get" ] ; then
-    UPDATE_CHECK="$(${PKG_MGR} -q --assume-no | grep installed | awk '{ print $1; }')"
+    UPDATE_CHECK="$(${PKG_MGR} upgrade -q --assume-no | grep installed | awk '{ print $1; }')"
   fi
 
   echo "Going to install ${UPDATE_CHECK} updates with:\n\t\t\t${UPDATE_CMD}"
