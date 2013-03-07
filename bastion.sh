@@ -85,6 +85,9 @@ prevalidate() {
 
   if [ "${RET}" = 0 ] ; then
     return 0
+  elif [ "${RET}" = 1 ] ; then
+    info "${CHECK_INFO}, skipping ${1}"
+    return 1
   elif [ "${RET}" = 2 ] ; then
     warn "${CHECK_INFO}"
     return 0
