@@ -67,11 +67,10 @@ main() {
       fi
     fi
 
-    if CMD_RESULTS="$((task_run) 2>&1)" ; then
+    if task_run ; then
       ok ${TASK}
     else
-      error "${TASK} could not complete. See error:"
-      error "${CMD_RESULTS}"
+      error "${TASK} could not complete. See any preceding errors."
     fi
 
   done
