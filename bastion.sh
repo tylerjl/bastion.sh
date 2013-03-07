@@ -151,7 +151,7 @@ distro_check() {
 }
 
 info()  { echo -e $'[\e[1;36m info \e[0m]' "$@" ; }
-query() { echo -n $'[\e[1;36mquery \e[0m]' $@ ; }
+query() { echo -n $'[\e[1;35mquery \e[0m]' $@ ; }
 ok()    { echo $'[\e[1;32m  ok  \e[0m]' $@ ; }
 error() { echo $'[\e[1;31merror \e[0m]' $@ ; }
 warn()  { echo $'[\e[1;33m warn \e[0m]' $@ ; }
