@@ -36,7 +36,7 @@ task_precheck() {
     UPDATE_CHECK="$(${PKG_MGR} -q --assume-no | grep installed | awk '{ print $1; }')"
   fi
 
-  if [ "${UPDATE_CHECK}" = "0" ] ; then
+  if [ ${UPDATE_CHECK} -lt 0 ] ; then
     echo "No updates available"
     return 1
   fi
