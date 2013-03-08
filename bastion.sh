@@ -21,12 +21,16 @@ Usage: $0 [-acvdh]
   -a  automatically run (assume defaults)
   -v  verbose
   -d  enable debugging output
+  -p  perform only passive checks (do not alter the host system)
   -h  display this help text"
 
 CAT="$(which cat)"
 AWK="$(which awk)"
 CUT="$(which cut)"
 GREP="$(which grep)"
+
+TYPE_AUDIT=200
+TYPE_MUTABLE=201
 
 #####################
 # Script entry point.
@@ -36,11 +40,12 @@ main() {
   # TODO: Uncomment in prod.
   # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
 
-  while getopts ":acvdh" opt ; do
+  while getopts ":acvdph" opt ; do
     case $opt in
       a) AUTO=1 ;;
       v) VERBOSE=1 ;;
       d) DEBUG=1 ;;
+      p) PASSIVE=1 ;;
       h) help ;;
     esac
   done
@@ -58,6 +63,12 @@ main() {
     source $script
 
     prevalidate $TASK task_precheck || continue
+
+    # Skip non-audit tasks
+    if [ "${PASSIVE}" = 1 ] && [ ! "$(task_type)" = "${TYPE_AUDIT}" ] ; then
+      info "${TASK} is not passive, skipping."
+      continue
+    fi
 
     if [ ! ${AUTO} ] ; then
       info "${TASK} wants to execute:\n\t\t$(task_explain)"

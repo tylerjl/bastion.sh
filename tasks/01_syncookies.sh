@@ -3,6 +3,8 @@
 FLAG="/proc/sys/net/ipv4/tcp_syncookies"
 CMD="/bin/echo 1 > $FLAG"
 
+task_type() { return ${TYPE_MUTABLE} ; }
+
 task_precheck() {
   if [ ! -f $FLAG ] ; then
     echo "$FLAG does not exist"
