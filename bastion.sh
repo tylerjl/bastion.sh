@@ -99,7 +99,12 @@ main() {
 
   done
 
+  quit
+}
+
+quit() {
   echo ; ok "Completed $(basename $0)"
+  exit 0
 }
 
 prevalidate() {
@@ -123,16 +128,20 @@ prevalidate() {
 ###########################
 # Confirm a step
 confirm() {
-  query "Proceed? (y/n): "
+  query "Proceed? (y/n/q): "
   read PROCEEDASK
 
-  until [ "${PROCEEDASK}" = "y" ] || [ "${PROCEEDASK}" = "n" ]; do
-    query "Please enter 'y' or 'n': "
+  until [ "${PROCEEDASK}" = "y" ] || \
+        [ "${PROCEEDASK}" = "n" ] || \
+        [ "${PROCEEDASK}" = "q" ]; do
+    query "Please enter 'y' or 'n' (or 'q' to quit): "
     read PROCEEDASK
   done
 
   if [ ${PROCEEDASK} = "n" ] ; then
     return 1
+  elif [ ${PROCEEDASK} = "q" ] ; then
+    quit
   else
     return 0
   fi
