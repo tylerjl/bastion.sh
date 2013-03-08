@@ -22,6 +22,7 @@ Usage: $0 [-acvdh]
   -v  verbose
   -d  enable debugging output
   -p  perform only passive checks (do not alter the host system)
+  -m  perform only checks that will actively modify the system
   -h  display this help text"
 
 CAT="$(which cat)"
@@ -40,21 +41,25 @@ main() {
   # TODO: Uncomment in prod.
   # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
 
-  while getopts ":acvdph" opt ; do
+  while getopts ":acvdpmh" opt ; do
     case $opt in
       a) AUTO=1 ;;
       v) VERBOSE=1 ;;
       d) DEBUG=1 ;;
       p) PASSIVE=1 ;;
+      m) MUTABLE=1 ;;
       h) help ;;
     esac
   done
+
+  [ ${MUTABLE} ] && [ ${PASSIVE} ] && death "Choose only one: -p or -m."
 
   distro_check || death "Unsupported Linux distribution."
 
   [ $DEBUG ] || [ $VERBOSE ] && info "Got distro of: $DISTRO"
 
   for script in ./tasks/* ; do
+
     [ -x $script ] || continue
 
     TASK="$(basename $script | \
@@ -62,13 +67,19 @@ main() {
 
     source $script
 
-    prevalidate $TASK task_precheck || continue
-
     # Skip non-audit tasks
-    if [ "${PASSIVE}" = 1 ] && [ ! "$(task_type)" = "${TYPE_AUDIT}" ] ; then
-      info "${TASK} is not passive, skipping."
-      continue
+    if [ "${PASSIVE}" = 1 ] || [ "${MUTABLE}" = 1 ] ; then
+      task_type ; TASK_TYPE=${?}
+      if [ ${PASSIVE} ] && [ "${TASK_TYPE}" != "${TYPE_AUDIT}" ] ; then
+        info "${TASK} is not passive, skipping."
+        continue
+      elif [ ${MUTABLE} ] && [ "${TASK_TYPE}" != "${TYPE_MUTABLE}" ] ; then
+        info "${TASK} is not mutable, skipping."
+        continue
+      fi
     fi
+
+    prevalidate $TASK task_precheck || continue
 
     if [ ! ${AUTO} ] ; then
       info "${TASK} wants to execute:\n\t\t$(task_explain)"

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-type() { echo AUDIT ; }
-
 if [ "${UID}" = "0" ] ; then
   CRONTAB_CMD="for user in \$(awk -F\: '{ print \$1; }' /etc/passwd) ; do echo \$user: ; crontab -u \$user -l 2>/dev/null ; done"
 else
   CRONTAB_CMD="crontab -l"
 fi
+
+task_type() { return ${TYPE_AUDIT} ; }
 
 task_precheck() {
 

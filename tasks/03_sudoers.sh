@@ -3,6 +3,8 @@
 SUDOER_GROUPS="grep -i '^%' /etc/sudoers | awk '{ print \$1; }' | sed 's/^.//' | sort | uniq"
 SUDOER_USERS="grep -E '^[a-z]' /etc/sudoers | sort | uniq"
 
+task_type() { return ${TYPE_AUDIT} ; }
+
 task_precheck() {
 
   # Is /etc/sudoers readable?

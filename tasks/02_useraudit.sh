@@ -1,7 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 CMD_USERLIST="cat /etc/shadow | grep -E -v '^[^:]+:(!!|[*])'"
 CMD_KEYLIST="find / -name authorized_keys 2>/dev/null"
+
+task_type() { return ${TYPE_AUDIT} ; }
 
 task_precheck() {
 

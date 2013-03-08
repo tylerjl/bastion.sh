@@ -3,6 +3,8 @@
 RC_LOCAL="/etc/rc.local"
 STARTUP_CMD="grep -v -i -E '^(#|$)' ${RC_LOCAL}"
 
+task_type() { return ${TYPE_AUDIT} ; }
+
 task_precheck() {
 
   # Is RC local readable?

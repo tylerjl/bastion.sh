@@ -11,6 +11,8 @@ else
   UPDATE_CMD="${PKG_MGR} upgrade -y"
 fi
 
+task_type() { return ${TYPE_MUTABLE} ; }
+
 task_precheck() {
 
   # Ensure the package manager is present
