@@ -36,8 +36,6 @@ main() {
   # TODO: Uncomment in prod.
   # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
 
-  distro_check || death "Unsupported Linux distribution."
-
   while getopts ":acvdh" opt ; do
     case $opt in
       a) AUTO=1 ;;
@@ -46,6 +44,8 @@ main() {
       h) help ;;
     esac
   done
+
+  distro_check || death "Unsupported Linux distribution."
 
   [ $DEBUG ] || [ $VERBOSE ] && info "Got distro of: $DISTRO"
 
