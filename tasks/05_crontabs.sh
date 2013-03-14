@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "${UID}" = "0" ] ; then
-  CRONTAB_CMD="for user in \$(awk -F\: '{ print \$1; }' /etc/passwd) ; do echo \$user: ; crontab -u \$user -l 2>/dev/null ; done"
+  CRONTAB_CMD="for user in \$(awk -F\: '{ print \$1; }' /etc/passwd) ; do ((crontab -l -u \${user} 2>&1) >/dev/null) && (echo \"\${user}:\" ; crontab -u \${user} -l 2>/dev/null ; echo) ; done"
 else
   CRONTAB_CMD="crontab -l"
 fi
@@ -33,7 +33,6 @@ task_explain() {
 task_run() {
   echo
   eval ${CRONTAB_CMD}
-  echo
   echo "[hit enter to continue]"
   read
 }
