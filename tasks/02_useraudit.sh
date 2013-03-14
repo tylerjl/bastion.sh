@@ -2,6 +2,7 @@
 
 CMD_USERLIST="cat /etc/shadow | grep -E -v '^[^:]+:(!!|[*])'"
 CMD_KEYLIST="find / -name authorized_keys 2>/dev/null"
+CMD_ROOTS="cat /etc/passwd | awk -F\: '{ if (\$3 == \"0\") { print \$1; } }' | grep -v root"
 
 task_type() { return ${TYPE_AUDIT} ; }
 
@@ -24,6 +25,7 @@ task_precheck() {
 task_explain() {
   echo "Going to show you a list of users for validation:\n\t\t\t${CMD_USERLIST}"
   echo "\t\tFind a list of users with public keys:\n\t\t\t${CMD_KEYLIST}"
+  echo "\t\tLook for users with UID 0:\n\t\t\t${CMD_ROOTS}"
 }
 
 task_run() {
@@ -42,5 +44,15 @@ task_run() {
   echo "if they are not trusted accounts."
   echo "[hit enter to continue]"
   read
+  ROOT_ACCTS="$(eval ${CMD_ROOTS})"
+  if [ ! -z ${ROOT_ACCTS} ] ; then
+    echo ${ROOT_ACCTS}
+    echo
+    echo "WARNING!!!!!"
+    echo "These users have UID 0. Only root should have UID 0."
+    echo "You should investigate this user account immediately."
+    echo "[hit enter to continue]"
+    read
+  fi
 }
 
