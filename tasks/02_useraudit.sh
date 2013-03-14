@@ -7,13 +7,18 @@ task_type() { return ${TYPE_AUDIT} ; }
 
 task_precheck() {
 
-  # Is /etc/shadow readable?
-  if [ ! -r /etc/shadow ] ; then
-    echo "cannot read /etc/shadow"
-    return 2
-  fi
+  RETVAL=0
 
-  return 0
+  # Is /etc/shadow readable?
+  CHECKFILES="shadow passwd"
+  for f in ${CHECKFILES} ; do
+    if [ ! -r /etc/${f} ] ; then
+      echo "cannot read /etc/${f}"
+      RETVAL=2
+    fi
+  done
+
+  return ${RETVAL}
 }
 
 task_explain() {
