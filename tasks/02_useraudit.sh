@@ -29,30 +29,44 @@ task_explain() {
 }
 
 task_run() {
-  echo
-  eval ${CMD_USERLIST}
-  echo
-  echo "These users have passwords set and can log in."
-  echo "If these users are okay, no further action is required."
-  echo "Otherwise, administer your users with usermod."
-  echo "[hit enter to continue]"
-  read
-  echo
-  eval ${CMD_KEYLIST}
-  echo
-  echo "These users have trusted public keys. Audit their authorized_keys"
-  echo "if they are not trusted accounts."
-  echo "[hit enter to continue]"
-  read
-  ROOT_ACCTS="$(eval ${CMD_ROOTS})"
-  if [ ! -z ${ROOT_ACCTS} ] ; then
-    echo ${ROOT_ACCTS}
+  if [ -r /etc/shadow ] ; then
+    eval ${CMD_USERLIST} 2>/dev/null
     echo
-    echo "WARNING!!!!!"
-    echo "These users have UID 0. Only root should have UID 0."
-    echo "You should investigate this user account immediately."
+    echo "These users have passwords set and can log in."
+    echo "If these users are okay, no further action is required."
+    echo "Otherwise, administer your users with usermod."
     echo "[hit enter to continue]"
     read
+  else
+    info "Cannot read /etc/shadow, skipping check."
+  fi
+
+  SSH_AUTHKEYS="$(eval ${CMD_KEYLIST} | grep -v '^$')"
+  if [ ! -z "${SSH_AUTHKEYS}" ] ; then
+    echo
+    echo "${SSH_AUTHKEYS}"
+    echo
+    echo "These users have trusted public keys. Audit their"
+    echo "authorized_keys if they are not trusted accounts."
+    echo "[hit enter to continue]"
+    read
+  else
+    ok "No authorized_keys files found on the system. Are you root?"
+  fi
+
+  if [ -r /etc/passwd ] ; then
+    ROOT_ACCTS="$(eval ${CMD_ROOTS})"
+    if [ ! -z ${ROOT_ACCTS} ] ; then
+      echo ${ROOT_ACCTS}
+      echo
+      echo "WARNING!!!!!"
+      echo "These users have UID 0. Only root should have UID 0."
+      echo "You should investigate this user account immediately."
+      echo "[hit enter to continue]"
+      read
+    fi
+  else
+    info "Cannot read /etc/passwd, skipping check."
   fi
 }
 
