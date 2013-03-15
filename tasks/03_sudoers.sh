@@ -10,7 +10,7 @@ task_precheck() {
   # Is /etc/sudoers readable?
   if [ ! -r /etc/sudoers ] ; then
     echo "cannot read /etc/sudoers"
-    return 2
+    return 3
   fi
 
   return 0
