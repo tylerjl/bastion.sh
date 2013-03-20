@@ -33,7 +33,7 @@ task_run() {
       echo -e "\t$(grep $group /etc/group)"
     done
     echo
-    echo "[hit enter to continue]"
+    echo -n "[hit enter to continue]"
     read
   fi
 
@@ -45,7 +45,7 @@ task_run() {
     echo
     echo -e "\t${S_USERS}"
     echo
-    echo "[hit enter to continue]"
+    echo -n "[hit enter to continue]"
     read
   fi
 }

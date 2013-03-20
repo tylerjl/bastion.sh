@@ -26,7 +26,7 @@ task_run() {
   echo
   echo -e "\t$(eval ${STARTUP_CMD})"
   echo
-  echo "[hit enter to continue]"
+  echo -n "[hit enter to continue]"
   read
 }
 

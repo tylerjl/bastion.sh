@@ -33,7 +33,7 @@ task_explain() {
 task_run() {
   echo
   eval ${CRONTAB_CMD}
-  echo "[hit enter to continue]"
+  echo -n "[hit enter to continue]"
   read
 }
 
