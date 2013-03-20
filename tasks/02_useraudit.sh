@@ -10,7 +10,7 @@ task_precheck() {
 
   RETVAL=0
 
-  # Is /etc/shadow readable?
+  # Are required files readable?
   CHECKFILES="shadow passwd"
   for f in ${CHECKFILES} ; do
     if [ ! -r /etc/${f} ] ; then
