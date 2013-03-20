@@ -31,9 +31,13 @@ task_explain() {
 }
 
 task_run() {
-  echo
-  eval ${CRONTAB_CMD}
-  echo -n "[hit enter to continue]"
-  read
+  CRONTABS="$(eval ${CRONTAB_CMD})"
+  if [ ! -z "${CRONTABS}" ] ; then
+    echo "${CRONTABS}"
+    echo -n "[hit enter to continue]"
+    read
+  else
+    info "no crontabs found"
+  fi
 }
 
