@@ -30,15 +30,16 @@ task_explain() {
 
 task_run() {
   if [ -r /etc/shadow ] ; then
+    echo
     eval ${CMD_USERLIST} 2>/dev/null
     echo
     echo "These users have passwords set and can log in."
     echo "If these users are okay, no further action is required."
     echo "Otherwise, administer your users with usermod."
-    echo "[hit enter to continue]"
+    echo -n "[hit enter to continue]"
     read
   else
-    info "Cannot read /etc/shadow, skipping check."
+    warn "Cannot read /etc/shadow, skipping check."
   fi
 
   SSH_AUTHKEYS="$(eval ${CMD_KEYLIST} | grep -v '^$')"
@@ -48,7 +49,8 @@ task_run() {
     echo
     echo "These users have trusted public keys. Audit their"
     echo "authorized_keys if they are not trusted accounts."
-    echo "[hit enter to continue]"
+    [ ${UID} == "0" ] || warn "Note: you're not root and may have missed some."
+    echo -n "[hit enter to continue]"
     read
   else
     ok "No authorized_keys files found on the system. Are you root?"
@@ -62,7 +64,7 @@ task_run() {
       echo "WARNING!!!!!"
       echo "These users have UID 0. Only root should have UID 0."
       echo "You should investigate this user account immediately."
-      echo "[hit enter to continue]"
+      echo -n "[hit enter to continue]"
       read
     fi
   else
