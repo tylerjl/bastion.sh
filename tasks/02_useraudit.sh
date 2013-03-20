@@ -59,11 +59,12 @@ task_run() {
   if [ -r /etc/passwd ] ; then
     ROOT_ACCTS="$(eval ${CMD_ROOTS})"
     if [ ! -z ${ROOT_ACCTS} ] ; then
+      echo
       echo ${ROOT_ACCTS}
       echo
-      echo "WARNING!!!!!"
+      warn "WARNING!!!!!"
       echo "These users have UID 0. Only root should have UID 0."
-      echo "You should investigate this user account immediately."
+      echo "You should investigate this user account IMMEDIATELY."
       echo -n "[hit enter to continue]"
       read
     fi
