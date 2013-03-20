@@ -18,7 +18,7 @@ HELPTEXT="$(basename $0) is a script meant to automatically configure many commo
 for a generic Linux installation.
 
 Usage: $0 [-acvdh]
-  -a  automatically run (assume defaults)
+  -y  answer yes to all (run automatically)
   -v  verbose
   -d  enable debugging output
   -p  perform only passive checks (do not alter the host system)
@@ -41,9 +41,9 @@ main() {
   # TODO: Uncomment in prod.
   # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
 
-  while getopts ":acvdpmh" opt ; do
+  while getopts ":ycvdpmh" opt ; do
     case $opt in
-      a) AUTO=1 ;;
+      y) AUTO=1 ;;
       v) VERBOSE=1 ;;
       d) DEBUG=1 ;;
       p) PASSIVE=1 ;;
