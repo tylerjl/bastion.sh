@@ -17,12 +17,13 @@
 HELPTEXT="$(basename $0) is a script meant to automatically configure many common settings
 for a generic Linux installation.
 
-Usage: $0 [-acvdh]
+Usage: $0 [-yvdpmfh]
   -y  answer yes to all (run automatically)
   -v  verbose
   -d  enable debugging output
   -p  perform only passive checks (do not alter the host system)
   -m  perform only checks that will actively modify the system
+  -f  force checks even if distro validation fails
   -h  display this help text"
 
 CAT="$(which cat)"
@@ -45,20 +46,21 @@ main() {
   # TODO: Uncomment in prod.
   # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
 
-  while getopts ":ycvdpmh" opt ; do
+  while getopts ":yvdpmfh" opt ; do
     case $opt in
       y) AUTO=1 ;;
       v) VERBOSE=1 ;;
       d) DEBUG=1 ;;
       p) PASSIVE=1 ;;
       m) MUTABLE=1 ;;
+      f) FORCE=1 ;;
       h) help ;;
     esac
   done
 
   [ ${MUTABLE} ] && [ ${PASSIVE} ] && death "Choose only one: -p or -m."
 
-  distro_check || death "Unsupported Linux distribution."
+  [ ${FORCE} ] || distro_check || death "Unsupported Linux distribution."
 
   [ $DEBUG ] || [ $VERBOSE ] && info "Got distro of: $DISTRO"
 
