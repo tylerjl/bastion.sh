@@ -66,7 +66,10 @@ main() {
 
   for script in ./tasks/* ; do
 
-    [ -x $script ] || continue
+    if [ ! -x $script ] ; then
+        info "${script} cannot be reading, skipping it"
+        continue
+    fi
 
     TASK="$(basename $script | \
       sed 's/^[^a-zA-Z]*\([a-zA-Z]\{1,\}\)[.][a-z]\{1,\}$/\1/')"
@@ -188,9 +191,9 @@ distro_check() {
   return 0
 }
 
-banner()  { echo -e "==> $@" ; }
-info()    { echo -e $'[\e[1;36m info \e[0m]' "$@" ; }
-query()   { echo -n $'[\e[1;35mquery \e[0m]' $@ ; }
+banner()  { echo "==> $@" ; }
+info()    { echo $'[\e[1;36m info \e[0m]' "$@" ; }
+query()   { echo $'[\e[1;35mquery \e[0m]' $@ ; }
 ok()      { echo $'[\e[1;32m  ok  \e[0m]' $@ ; }
 error()   { echo $'[\e[1;31merror \e[0m]' $@ ; }
 warn()    { echo $'[\e[1;33m warn \e[0m]' $@ ; }
