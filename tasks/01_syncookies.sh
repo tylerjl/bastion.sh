@@ -8,10 +8,10 @@ task_type() { return ${TYPE_MUTABLE} ; }
 task_precheck() {
   if [ ! -f $FLAG ] ; then
     echo "$FLAG does not exist"
-    return 2
+    return ${RAISE_SKIP}
   elif silence ${GREP} 1 ${FLAG} ; then
     echo "${FLAG} is already set"
-    return 1
+    return ${RAISE_SKIP}
   fi
   return 0
 }

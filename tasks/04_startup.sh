@@ -10,7 +10,7 @@ task_precheck() {
   # Is RC local readable?
   if [ ! -r /etc/rc.local ] ; then
     echo "cannot read /etc/rc.local"
-    return 2
+    return ${RAISE_SKIP}
   fi
 
   return 0

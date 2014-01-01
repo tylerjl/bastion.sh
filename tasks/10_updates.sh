@@ -17,14 +17,14 @@ task_precheck() {
 
   # Ensure the package manager is present
   if ! silence which $PKG_MGR ; then
-    echo "${PKG_MGR} does not exist"
-    return 3
+    echo "Package manager '${PKG_MGR}' does not exist"
+    return 4
   fi
 
   for bin in wc bc ; do
     if ! silence which $bin ; then
       echo "${bin} binary is missing"
-      return 4
+      return 5
     fi
   done
 
@@ -33,14 +33,14 @@ task_precheck() {
   elif [ "$(basename ${PKG_MGR})" = "apt-get" ] ; then
     if ! silence ${PKG_MGR} update ; then
       echo "Could not update ${PKG_MGR}"
-      return 5
+      return 6
     fi
     UPDATE_CHECK="$(${PKG_MGR} -q --assume-no 2>/dev/null | grep installed | awk '{ print $1; }')"
   fi
 
   if [ ${UPDATE_CHECK} -lt 0 ] ; then
     echo "No updates available"
-    return 1
+    return ${RAISE_SKIP}
   fi
 
   return 0

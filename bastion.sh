@@ -33,6 +33,10 @@ GREP="$(which grep)"
 TYPE_AUDIT=200
 TYPE_MUTABLE=201
 
+RAISE_SKIP=1
+RAISE_WARN=2
+RAISE_INF0=3
+
 #####################
 # Script entry point.
 
@@ -113,10 +117,10 @@ prevalidate() {
 
   if [ "${RET}" = 0 ] ; then
     return 0
-  elif [ "${RET}" = 1 ] ; then
+  elif [ "${RET}" = ${RAISE_SKIP} ] ; then
     info "${CHECK_INFO}, skipping ${1}"
     return 1
-  elif [ "${RET}" = 2 ] ; then
+  elif [ "${RET}" = ${RAISE_WARN} ] ; then
     warn "${CHECK_INFO}"
     return 0
   else

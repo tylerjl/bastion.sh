@@ -15,7 +15,7 @@ task_precheck() {
   for f in ${CHECKFILES} ; do
     if [ ! -r /etc/${f} ] ; then
       echo "cannot read /etc/${f}"
-      RETVAL=2
+      RETVAL=${RAISE_WARN}
     fi
   done
 

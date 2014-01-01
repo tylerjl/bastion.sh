@@ -21,7 +21,7 @@ task_precheck() {
     WARN=1
   fi
 
-  [ "${WARN}" = "1" ] && return 2
+  [ "${WARN}" = "1" ] && return ${RAISE_WARN}
 
   return 0
 }
