@@ -23,9 +23,9 @@ task_precheck() {
 }
 
 task_explain() {
-  echo "Going to show you a list of users for validation:\n\t\t\t${CMD_USERLIST}"
-  echo "\t\tFind a list of users with public keys:\n\t\t\t${CMD_KEYLIST}"
-  echo "\t\tLook for users with UID 0:\n\t\t\t${CMD_ROOTS}"
+  echo -e "Going to show you a list of users for validation:\n\t\t\t${CMD_USERLIST}"
+  echo -e "\t\tFind a list of users with public keys:\n\t\t\t${CMD_KEYLIST}"
+  echo -e "\t\tLook for users with UID 0:\n\t\t\t${CMD_ROOTS}"
 }
 
 task_run() {

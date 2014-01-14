@@ -17,7 +17,7 @@ task_precheck() {
 }
 
 task_explain() {
-  echo "Going to show you startup scripts:\n\t\t\t${RC_LOCAL}"
+  echo -e "Going to show you startup scripts:\n\t\t\t${RC_LOCAL}"
 }
 
 task_run() {

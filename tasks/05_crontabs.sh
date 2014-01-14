@@ -27,7 +27,7 @@ task_precheck() {
 }
 
 task_explain() {
-  echo "Going to show you active crontabs:\n\t\t\t${CRONTAB_CMD}"
+  echo -e "Going to show you active crontabs:\n\t\t\t${CRONTAB_CMD}"
 }
 
 task_run() {
