@@ -4,14 +4,14 @@
 if echo "${DISTRO}" | grep -E -i '(centos|rh|fc)' >/dev/null ; then
   # Yum-based
   PKG_MGR="$(which yum)"
-  UPDATE_CMD="${PKG_MGR} update -y"
+  BASTION_TASK_CMD="${PKG_MGR} update -y"
 else
   # DPKG based
   PKG_MGR="$(which apt-get)"
-  UPDATE_CMD="${PKG_MGR} upgrade -y"
+  BASTION_TASK_CMD="${PKG_MGR} upgrade -y"
 fi
 
-task_type() { return ${TYPE_MUTABLE} ; }
+BASTION_TASK_TYPE=$BASTION_TYPE_ACTIVE
 
 task_precheck() {
 
@@ -40,23 +40,10 @@ task_precheck() {
 
   if [ ${UPDATE_CHECK} -lt 0 ] ; then
     echo "No updates available"
-    return ${RAISE_SKIP}
+    return ${BASTION_RAISE_SKIP}
+  else
+    info "${UPDATE_CHECK} updates available."
   fi
 
   return 0
 }
-
-task_explain() {
-  if [ "$(basename ${PKG_MGR})" = "yum" ] ; then
-    UPDATE_CHECK="$(${PKG_MGR} list updates -q 2>/dev/null | wc -l | xargs echo -1 + | bc)"
-  elif [ "$(basename ${PKG_MGR})" = "apt-get" ] ; then
-    UPDATE_CHECK="$(${PKG_MGR} upgrade -q --assume-no 2>/dev/null | grep installed | awk '{ print $1; }')"
-  fi
-
-  echo "Going to install ${UPDATE_CHECK} updates with:\n\t\t\t${UPDATE_CMD}"
-}
-
-task_run() {
-  eval $UPDATE_CMD
-}
-

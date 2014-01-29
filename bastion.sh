@@ -17,12 +17,12 @@
 HELPTEXT="$(basename $0) is a script meant to automatically configure many common settings
 for a generic Linux installation.
 
-Usage: $0 [-yvdpmfh]
+Usage: $0 [-yvdpafh]
   -y  answer yes to all (run automatically)
   -v  verbose
   -d  enable debugging output
   -p  perform only passive checks (do not alter the host system)
-  -m  perform only checks that will actively modify the system
+  -a  perform only checks that will actively modify the system
   -f  force checks even if distro validation fails
   -h  display this help text"
 
@@ -31,34 +31,35 @@ AWK="$(which awk)"
 CUT="$(which cut)"
 GREP="$(which grep)"
 
-TYPE_AUDIT=200
-TYPE_MUTABLE=201
+BASTION_TYPE_PASSIVE=200
+BASTION_TYPE_ACTIVE=201
 
-RAISE_SKIP=1
-RAISE_WARN=2
-RAISE_INF0=3
+BASTION_RAISE_SKIP=1
+BASTION_RAISE_WARN=2
+BASTION_RAISE_INF0=3
 
 #####################
 # Script entry point.
 
 main() {
 
-  # TODO: Uncomment in prod.
-  # [ "${UID}" == "0" ] || death "This program must be run as root.  Exiting."
+  if [ "${UID}" == "0" ] ; then
+    death "Run as an unprivileged user. $0 will ask for root permission if required."
+  fi
 
-  while getopts ":yvdpmfh" opt ; do
+  while getopts ":yvdpafh" opt ; do
     case $opt in
       y) AUTO=1 ;;
       v) VERBOSE=1 ;;
       d) DEBUG=1 ;;
       p) PASSIVE=1 ;;
-      m) MUTABLE=1 ;;
+      a) ACTIVE=1 ;;
       f) FORCE=1 ;;
       h) help ;;
     esac
   done
 
-  [ ${MUTABLE} ] && [ ${PASSIVE} ] && death "Choose only one: -p or -m."
+  [ ${ACTIVE} ] && [ ${PASSIVE} ] && death "Choose only one: -p or -a."
 
   [ ${FORCE} ] || distro_check || death "Unsupported Linux distribution."
 
@@ -66,41 +67,40 @@ main() {
 
   for script in ./tasks/* ; do
 
-    if [ ! -x $script ] ; then
-        info "${script} cannot be reading, skipping it"
+    if [ ! -r "${script}" ] ; then
+        info "${script} cannot be read, skipping it"
         continue
     fi
 
     TASK="$(basename $script | \
-      sed 's/^[^a-zA-Z]*\([a-zA-Z]\{1,\}\)[.][a-z]\{1,\}$/\1/')"
+      sed 's/^[^a-zA-Z]*\([a-zA-Z_]\{1,\}\)[.][a-z]\{1,\}$/\1/')"
 
-    echo ; banner ${TASK}
+    banner ${TASK}
 
-    source $script
+    source "${script}"
 
     # Skip non-audit tasks
-    if [ "${PASSIVE}" = 1 ] || [ "${MUTABLE}" = 1 ] ; then
-      task_type ; TASK_TYPE=${?}
-      if [ ${PASSIVE} ] && [ "${TASK_TYPE}" != "${TYPE_AUDIT}" ] ; then
+    if [ "${PASSIVE}" = 1 ] || [ "${ACTIVE}" = 1 ] ; then
+      if [ ${PASSIVE} ] && [ "${BASTION_TASK_TYPE}" != "${BASTION_TYPE_PASSIVE}" ] ; then
         info "${TASK} is not passive, skipping."
         continue
-      elif [ ${MUTABLE} ] && [ "${TASK_TYPE}" != "${TYPE_MUTABLE}" ] ; then
-        info "${TASK} is not mutable, skipping."
+      elif [ ${ACTIVE} ] && [ "${BASTION_TASK_TYPE}" != "${BASTION_TYPE_ACTIVE}" ] ; then
+        info "${TASK} is not active, skipping."
         continue
       fi
     fi
 
-    prevalidate $TASK task_precheck || continue
+    task_precheck || continue
 
     if [ ! ${AUTO} ] ; then
-      info "${TASK} wants to execute:\n\t\t$(task_explain)"
+      info "${TASK} wants to execute:\n\t\t${BASTION_TASK_CMD}"
       if ! confirm ; then
         info "Skipping ${TASK}"
         continue
       fi
     fi
 
-    if task_run ; then
+    if eval "${BASTION_TASK_CMD}" ; then
       ok ${TASK}
     else
       error "${TASK} could not complete. See any preceding errors."
@@ -114,24 +114,6 @@ main() {
 quit() {
   echo ; ok "Completed $(basename $0)"
   exit 0
-}
-
-prevalidate() {
-  CHECK_INFO="$($2)"
-  RET=$?
-
-  if [ "${RET}" = 0 ] ; then
-    return 0
-  elif [ "${RET}" = ${RAISE_SKIP} ] ; then
-    info "${CHECK_INFO}, skipping ${1}"
-    return 1
-  elif [ "${RET}" = ${RAISE_WARN} ] ; then
-    warn "${CHECK_INFO}"
-    return 0
-  else
-    error "${CHECK_INFO}, skipping ${1}"
-    return 1
-  fi
 }
 
 ###########################
@@ -191,7 +173,7 @@ distro_check() {
   return 0
 }
 
-banner()  { echo "==> $@" ; }
+banner()  { echo -e "\n==> $@" ; }
 info()    { echo -e $'[\e[1;36m info \e[0m]' "$@" ; }
 query()   { echo -e $'[\e[1;35mquery \e[0m]' $@ ; }
 ok()      { echo -e $'[\e[1;32m  ok  \e[0m]' $@ ; }
