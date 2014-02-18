@@ -174,8 +174,8 @@ distro_check() {
 }
 
 banner()  { echo -e "\n==> $@" ; }
-info()    { echo -e $'[\e[1;36m info \e[0m]' "$@" ; }
-query()   { echo -e $'[\e[1;35mquery \e[0m]' $@ ; }
+info()    { echo -e $'[\e[1;36m info \e[0m]' "$@ " ; }
+query()   { echo -ne $'[\e[1;35mquery \e[0m]' $@ ; }
 ok()      { echo -e $'[\e[1;32m  ok  \e[0m]' $@ ; }
 error()   { echo -e $'[\e[1;31merror \e[0m]' $@ ; }
 warn()    { echo -e $'[\e[1;33m warn \e[0m]' $@ ; }

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 BASTION_TASK_TYPE=$BASTION_TYPE_PASSIVE
-BASTION_TASK_CMD="cat /etc/passwd | awk -F\: '{ if (\$3 == \"0\") { print \$1; } }' | grep -v root"
+BASTION_TASK_CMD="cat /etc/passwd | awk -F\: '{ if (\$3 == \"0\") { print \$1; } }' | grep -v root && echo 'WARNING: These users have UID 0!!'"
 
 task_precheck() {
 

@@ -7,8 +7,12 @@ task_precheck() {
 
   # Is /etc/sudoers readable?
   if [ ! -r /etc/sudoers ] ; then
-    echo "cannot read /etc/sudoers"
-    return ${BASTION_RAISE_SKIP}
+    warn "cannot read /etc/sudoers. Try to run with sudo?"
+    if confirm ; then
+      BASTION_TASK_CMD="sudo su -c \"${BASTION_TASK_CMD}\""
+    else
+      return ${BASTION_RAISE_SKIP}
+    fi
   fi
 
   return 0

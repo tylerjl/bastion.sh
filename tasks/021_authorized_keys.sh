@@ -7,9 +7,13 @@ task_precheck() {
 
   RETVAL=0
 
-  if [ "${UID}" == "0" ] ; then
-    echo "Running without root privs, not all authorized_keys will be found."
-    RETVAL=$BASTION_RAISE_WARN
+  if [ "${UID}" != "0" ] ; then
+    echo "Run with root privileges to find all authorized_keys files?"
+    if confirm ; then
+      BASTION_TASK_CMD="sudo su -c '${BASTION_TASK_CMD}'"
+    else
+      warn "Will only find authorized_key files you have permissions to read"
+    fi
   fi
 
   return ${RETVAL}
