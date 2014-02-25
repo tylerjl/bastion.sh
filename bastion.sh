@@ -67,6 +67,8 @@ main() {
 
   for script in ./tasks/* ; do
 
+    [ -f "${script}" ] || continue
+
     if [ ! -r "${script}" ] ; then
         info "${script} cannot be read, skipping it"
         continue
